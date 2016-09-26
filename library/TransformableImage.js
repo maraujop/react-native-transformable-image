@@ -48,7 +48,7 @@ export default class TransformableImage extends Component {
       initialScale: props.initialScale,
       imageLoaded: false,
       pixels: undefined,
-      keyAcumulator: 1
+      keyAccumulator: 1
     };
   }
 
@@ -60,7 +60,7 @@ export default class TransformableImage extends Component {
 
   componentWillReceiveProps(nextProps) {
     if (!sameSource(this.props.source, nextProps.source)) {
-      this.setState({ keyAcumulator: this.state.keyAcumulator + 1 })
+      //this.setState({ keyAccumulator: this.state.keyAccumulator + 1 })
 
       // Make sure new image resets its initial cover scale
       if (nextProps.automaticInitialCoverScale) {
@@ -95,8 +95,22 @@ export default class TransformableImage extends Component {
       }
     }
 
+    var child = null
     if (initialScale == null && this.props.automaticInitialCoverScale) {
-      return <View onLayout={this.onLayout.bind(this)} style={this.props.style} ></View>
+      child = (
+        <View onLayout={this.onLayout.bind(this)} style={this.props.style}></View>
+      )
+    } else {
+      child = (
+        <Image
+          {...this.props}
+          style={[this.props.style, {backgroundColor: 'transparent'}]}
+          resizeMode={'contain'}
+          onLoadStart={this.onLoadStart.bind(this)}
+          onLoad={this.onLoad.bind(this)}
+          capInsets={{left: 0.1, top: 0.1, right: 0.1, bottom: 0.1}} //on iOS, use capInsets to avoid image downsampling
+        />
+      )
     }
 
     return (
@@ -116,14 +130,7 @@ export default class TransformableImage extends Component {
         onLayout={this.onLayout.bind(this)}
         style={this.props.style}
       >
-        <Image
-          {...this.props}
-          style={[this.props.style, {backgroundColor: 'transparent'}]}
-          resizeMode={'contain'}
-          onLoadStart={this.onLoadStart.bind(this)}
-          onLoad={this.onLoad.bind(this)}
-          capInsets={{left: 0.1, top: 0.1, right: 0.1, bottom: 0.1}} //on iOS, use capInsets to avoid image downsampling
-        />
+        {child}
       </ViewTransformer>
     );
   }
@@ -195,7 +202,9 @@ export default class TransformableImage extends Component {
       }
     }
 
-    let newState = { initialScale: initialScale }
+    let newState = {
+      initialScale: initialScale,
+    }
     if (this.state.updateTransform) {
       this.refs['viewTransformer'].updateTransform({
         scale: initialScale,
