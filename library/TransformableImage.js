@@ -52,15 +52,9 @@ export default class TransformableImage extends Component {
     };
   }
 
-  componentWillMount() {
-    if (!this.props.pixels) {
-      this.getImageSize(this.props.source);
-    }
-  }
-
   componentWillReceiveProps(nextProps) {
     if (!sameSource(this.props.source, nextProps.source)) {
-      //this.setState({ keyAccumulator: this.state.keyAccumulator + 1 })
+      this.setState({ keyAcumulator: this.state.keyAccumulator + 1 })
 
       // Make sure new image resets its initial cover scale
       if (nextProps.automaticInitialCoverScale) {
@@ -68,11 +62,18 @@ export default class TransformableImage extends Component {
       }
 
       // image source changed, clear last image's pixels info if any
-      if (typeof nextProps.pixels == 'undefined') {
-        this.getImageSize(nextProps.source);
-      } else {
-        this.setInitialCoverScale(this.state.width, this.state.height);
-      }
+      this.setInitialCoverScale(this.state.width, this.state.height);
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    // When we are given the image size and have to calculate initialScale
+    if (
+      this.props.pixels != prevProps.pixels &&
+      this.state.initialScale == null &&
+      this.props.automaticInitialCoverScale
+    ) {
+      this.setInitialCoverScale(this.state.width, this.state.height);
     }
   }
 
@@ -202,9 +203,7 @@ export default class TransformableImage extends Component {
       }
     }
 
-    let newState = {
-      initialScale: initialScale,
-    }
+    let newState = { initialScale: initialScale }
     if (this.state.updateTransform) {
       this.refs['viewTransformer'].updateTransform({
         scale: initialScale,
@@ -232,41 +231,6 @@ export default class TransformableImage extends Component {
       }
 
       this.setState(newState);
-    }
-  }
-
-  getImageSize(source) {
-    if(!source) return;
-
-    DEV && console.log('getImageSize...' + JSON.stringify(source));
-
-    if (typeof Image.getSize === 'function') {
-      if (source && source.uri) {
-        Image.getSize(
-          source.uri,
-          (width, height) => {
-            DEV && console.log('getImageSize...width=' + width + ', height=' + height);
-            if (width && height) {
-              this.setState(
-                {pixels: {width, height}},
-                () => {
-                  this.setInitialCoverScale(this.state.width, this.state.height)
-                }
-              );
-
-              if (this.props.onSizeFound) {
-                this.props.onSizeFound({width, height});
-              }
-            }
-          },
-          (error) => {
-            console.error('getImageSize...error=' + JSON.stringify(error) + ', source=' + JSON.stringify(source));
-          })
-      } else {
-        console.warn('getImageSize...please provide pixels prop for local images');
-      }
-    } else {
-      console.warn('getImageSize...Image.getSize function not available before react-native v0.28');
     }
   }
 
