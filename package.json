@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/ldn0x7dc/react-native-transformable-image#readme",
   "dependencies": {
-    "react-native-view-transformer": "git+https://github.com/maraujop/react-native-view-transformer.git#feature-enableLimits"
+    "react-native-view-transformer": "git+https://github.com/maraujop/react-native-view-transformer.git#755dfcd09ea01d75244728e69c63d9c89ef69a5c"
   }
 }
