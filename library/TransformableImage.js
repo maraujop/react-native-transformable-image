@@ -1,5 +1,7 @@
 'use strict';
 
+import FastImage from 'react-native-fast-image'
+
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { Image, View, PixelRatio } from 'react-native';
@@ -110,7 +112,7 @@ export default class TransformableImage extends Component {
       )
     } else {
       child = (
-        <Image
+        <FastImage
           {...this.props}
           style={[this.props.style, {backgroundColor: 'transparent'}]}
           resizeMode={'contain'}
